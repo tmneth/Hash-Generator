@@ -10,26 +10,25 @@ class Hash {
 
 private:
 
-    std::uint32_t m_hash_values[8];
+    std::uint32_t m_hashVal[8];
 
-    std::uint32_t m_const_values[8] = {
-            0x42a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1,
-            0x923f82a4, 0xab1c5ed5
-    };
+    std::uint32_t m_keys[8];
 
-    std::vector<uint8_t> str_to_ascii(std::string input);
+    void initKeys();
 
-    std::vector<uint8_t> pad_bin(std::vector<uint8_t> bytes);
+    std::vector<uint8_t> strToAscii(const std::string &input);
 
-    void compute_hash(std::string input, std::vector<uint8_t> bytes);
+    std::vector<uint8_t> padBin(std::vector<uint8_t> bytes);
 
-    std::string hash_to_hex();
+    void computeHash(const std::string &input, std::vector<uint8_t> bytes);
+
+    std::string hashToHex();
 
 public:
 
     Hash() = default;
 
-    std::string get_hash_val(std::string input);
+    std::string getHashVal(const std::string &input);
 
     ~Hash() = default;
 
