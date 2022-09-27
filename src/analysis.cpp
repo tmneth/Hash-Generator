@@ -27,14 +27,14 @@ public:
 void specificationTest() {
 
     Hash hash;
-    string filenames[5] = {"letter", "char", "random_1000_1", "random_1000_2", "empty"};
+    string filenames[7] = {"letter", "char", "rand_1000_1", "rand_1000_2", "sim_1500_1", "sim_1500_2", "empty"};
     vector<string> hex;
     bool isDeterministic = true;
 
     cout << "\nHashing contents of the files for the first time... " << endl;
 
-    for (int i = 0; i < 5; ++i) {
-        string fileContents = readFileIntoStr(filenames[i] + ".txt");
+    for (int i = 0; i < 7; ++i) {
+        string fileContents = readFileIntoStr("data/" + filenames[i] + ".txt");
         string hashValue = hash.getHashVal(fileContents);
         hex.push_back(hashValue);
         cout << "File hashing: " << hashValue << "; length: " << hashValue.size() * 4 << " bit" << endl;
@@ -42,8 +42,8 @@ void specificationTest() {
 
     cout << "\nHashing contents of the files the for second time... " << endl;
 
-    for (int i = 0; i < 5; ++i) {
-        string fileContents = readFileIntoStr(filenames[i] + ".txt");
+    for (int i = 0; i < 7; ++i) {
+        string fileContents = readFileIntoStr("data/" + filenames[i] + ".txt");
         string hashValue = hash.getHashVal(fileContents);
         isDeterministic = (hashValue == hex[i]) & isDeterministic;
         cout << "File hashing: " << hashValue << "; length: " << hashValue.size() * 4 << " bit" << endl;
@@ -66,7 +66,7 @@ void efficiencyTest() {
 
     for (int i = 0; i < rounds; ++i) {
 
-        std::ifstream fin("konstitucija.txt");
+        std::ifstream fin("data/konstitucija.txt");
         string line;
 
         while (getline(fin, line)) {
@@ -87,10 +87,10 @@ void collisionTest() {
 
     Hash hash;
 
-    if (!std::filesystem::exists("rand_comb.txt"))
+    if (!std::filesystem::exists("data/rand_comb.txt"))
         genRandPairs();
 
-    std::ifstream fin("rand_comb.txt");
+    std::ifstream fin("data/rand_comb.txt");
     string line, str1, str2;
 
     int collisions = 0;
@@ -110,10 +110,10 @@ void collisionTest() {
 void avalancheEffectTest() {
 
     Hash hash;
-    if (!std::filesystem::exists("sim_comb.txt"))
+    if (!std::filesystem::exists("data/sim_comb.txt"))
         genSimPairs();
 
-    std::ifstream fin("sim_comb.txt");
+    std::ifstream fin("data/sim_comb.txt");
     string line, str1, str2;
 
     double hexMaxDiff = 0, hexMinDiff = 100.0, bitMaxDiff = 0, bitMinDiff = 100.0;

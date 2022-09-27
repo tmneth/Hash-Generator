@@ -45,7 +45,7 @@ void genRandPairs() {
         for (int j = 0; j < 25000 / 2; j++)
             buffer.append(randomString(length[i]) + " " + randomString(length[i]) + "\n");
 
-    std::ofstream fout("rand_comb.txt");
+    std::ofstream fout("data/rand_comb.txt");
     fout << buffer.data();
     fout.close();
 }
@@ -67,7 +67,7 @@ void genSimPairs() {
             buffer.append(curStr + " " + mutateStr(curStr) + "\n");
         }
 
-    std::ofstream fout("sim_comb.txt");
+    std::ofstream fout("data/sim_comb.txt");
     fout << buffer.data();
     fout.close();
 }
