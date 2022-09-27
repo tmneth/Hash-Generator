@@ -1,13 +1,9 @@
 #include "../include/analysis.h"
 
 class Timer {
-
 private:
-
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
-
 public:
-
     Timer() : start{std::chrono::high_resolution_clock::now()} {}
 
     void reset() { start = std::chrono::high_resolution_clock::now(); }
@@ -17,15 +13,9 @@ public:
                 std::chrono::high_resolution_clock::now() - start)
                 .count();
     }
-
 };
 
-/**
- * Test if hash function produces fixed size 256 bit hex string.
- * Test if hash procedure is deterministic.
- */
 void specificationTest() {
-
     Hash hash;
     string filenames[7] = {"letter", "char", "rand_1000_1", "rand_1000_2", "sim_1500_1", "sim_1500_2", "empty"};
     vector<string> hex;
@@ -35,7 +25,7 @@ void specificationTest() {
 
     for (int i = 0; i < 7; ++i) {
         string fileContents = readFileIntoStr("data/" + filenames[i] + ".txt");
-        string hashValue = hash.getHashVal(fileContents);
+        string hashValue = hash(fileContents);
         hex.push_back(hashValue);
         cout << "File hashing: " << hashValue << "; length: " << hashValue.size() * 4 << " bit" << endl;
     }
@@ -44,25 +34,35 @@ void specificationTest() {
 
     for (int i = 0; i < 7; ++i) {
         string fileContents = readFileIntoStr("data/" + filenames[i] + ".txt");
-        string hashValue = hash.getHashVal(fileContents);
+        string hashValue = hash(fileContents);
         isDeterministic = (hashValue == hex[i]) & isDeterministic;
         cout << "File hashing: " << hashValue << "; length: " << hashValue.size() * 4 << " bit" << endl;
     }
 
     cout << "\nHashing algorithm is" << (isDeterministic ? " " : " not ") << "deterministic." << endl;
-
 }
 
-/**
- * Measure execution time of the hashing function.
- */
-void efficiencyTest() {
+struct HashFunc {
+    string name;
+    double hashingTime;
+};
 
+void efficiencyTest() {
     Hash hash;
+    SHA256 sha256;
+    MD5 md5;
+    SHA1 sha1;
+    Keccak keccak;
+
     Timer clock;
 
     int rounds{100};
-    double duration{0};
+
+    HashFunc func[5] = {{"hash"},
+                        {"sha256"},
+                        {"md5"},
+                        {"sha1"},
+                        {"keccak"}};
 
     for (int i = 0; i < rounds; ++i) {
 
@@ -70,21 +70,33 @@ void efficiencyTest() {
         string line;
 
         while (getline(fin, line)) {
+
             clock.reset();
-            hash.getHashVal(line);
-            duration += clock.elapsed();
+            hash(line);
+            func[0].hashingTime += clock.elapsed();
+
+            clock.reset();
+            sha256(line);
+            func[1].hashingTime += clock.elapsed();
+
+            clock.reset();
+            md5(line);
+            func[2].hashingTime += clock.elapsed();
+
+            clock.reset();
+            sha1(line);
+            func[3].hashingTime += clock.elapsed();
+
+            clock.reset();
+            keccak(line);
+            func[4].hashingTime += clock.elapsed();
         }
     }
-
-    cout << "Average time: " << (duration / rounds) << endl;
-
+    for (const HashFunc &h: func)
+        cout << h.name << " average hashing time: " << (h.hashingTime / rounds) << "ms." << endl;
 }
 
-/**
- * Count collisions.
- */
 void collisionTest() {
-
     Hash hash;
 
     if (!std::filesystem::exists("data/rand_comb.txt"))
@@ -96,20 +108,17 @@ void collisionTest() {
     int collisions = 0;
     for (int i = 0; i < 100000; ++i) {
         fin >> str1 >> str2;
-        if (hash.getHashVal(str1) == hash.getHashVal(str2)) collisions++;
+        if (hash(str1) == hash(str2)) collisions++;
     }
     cout << (collisions ? "Collisions found: " + std::to_string(collisions) : "No collisions were found.") << endl;
 
     fin.close();
-
 }
 
-/**
- * Test Avalanche effect.
- */
-void avalancheEffectTest() {
+template<class HashFunc>
+void avalancheEffectTest(double blockSize) {
+    HashFunc object;
 
-    Hash hash;
     if (!std::filesystem::exists("data/sim_comb.txt"))
         genSimPairs();
 
@@ -117,16 +126,17 @@ void avalancheEffectTest() {
     string line, str1, str2;
 
     double hexMaxDiff = 0, hexMinDiff = 100.0, bitMaxDiff = 0, bitMinDiff = 100.0;
-    double hexAvgDiff, bitAvgDiff, diffHex, diffBit;
+    double hexAvgDiff = 0, bitAvgDiff = 0, diffHex, diffBit;
+    double wordSize = object("word").size();
 
     for (int j = 0; j < 100000; ++j) {
         int diff_hex = 0, diff_bit = 0;
         fin >> str1 >> str2;
 
-        str1 = hash.getHashVal(str1);
-        str2 = hash.getHashVal(str2);
+        str1 = object(str1);
+        str2 = object(str2);
 
-        for (int i = 0; i < 64; i++) {
+        for (int i = 0; i < wordSize; i++) {
 
             if (str1[i] != str2[i]) diff_hex++;
 
@@ -136,8 +146,8 @@ void avalancheEffectTest() {
             diff_bit += 8 - (str1Byte ^ str2Byte).count();
         }
 
-        diffHex = (diff_hex / 64.0) * 100;
-        diffBit = (diff_bit / 512.0) * 100;
+        diffHex = (diff_hex / wordSize) * 100;
+        diffBit = (diff_bit / blockSize) * 100;
 
 
         hexAvgDiff += diffHex;
@@ -164,5 +174,24 @@ void avalancheEffectTest() {
 
     cout << "Biggest difference (hex): " << std::setprecision(2) << hexMaxDiff << "%" << endl;
     cout << "Biggest difference (bit): " << std::setprecision(2) << bitMaxDiff << "%" << endl;
+}
 
+void avalancheEffectComparison() {
+    Hash hash;
+    SHA256 sha256;
+    MD5 md5;
+    SHA1 sha1;
+    CRC32 crc32;
+    Keccak keccak;
+
+    cout << "HASH: " << endl;
+    avalancheEffectTest<Hash>(512);
+    cout << "SHA256: " << endl;
+    avalancheEffectTest<SHA256>(512);
+    cout << "MD5: " << endl;
+    avalancheEffectTest<MD5>(512);
+    cout << "SHA1: " << endl;
+    avalancheEffectTest<SHA1>(512);
+    cout << "KECCAK: " << endl;
+    avalancheEffectTest<Keccak>(512);
 }

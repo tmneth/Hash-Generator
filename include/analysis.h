@@ -8,6 +8,11 @@
 #include "../include/hash.h"
 #include "../include/helpers.h"
 
+#include "../lib/hash-library/sha256.h"
+#include "../lib/hash-library/md5.h"
+#include "../lib/hash-library/sha1.h"
+#include "../lib/hash-library/keccak.h"
+
 using std::cout;
 using std::cin;
 using std::endl;
@@ -20,4 +25,4 @@ void efficiencyTest();
 
 void collisionTest();
 
-void avalancheEffectTest();
+void avalancheEffectComparison();
