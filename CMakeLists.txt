@@ -3,4 +3,10 @@ project(hash_generator)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(hash_generator src/analysis.cpp src/main.cpp src/hash.cpp src/helpers.cpp include/hash.h include/analysis.h include/helpers.h)
+add_compile_options(-O3)
+
+include_directories(include)
+include_directories(lib)
+
+file(GLOB SOURCES CONFIGURE_DEPENDS "src/*.cpp" "lib/hash-library/sha256.cpp"  "lib/hash-library/md5.cpp" "lib/hash-library/sha1.cpp" "lib/hash-library/keccak.cpp")
+add_executable(test ${SOURCES})

@@ -16,15 +16,15 @@ public:
 };
 
 void specificationTest() {
-    Hash hash;
+    Hash hash{};
     string filenames[7] = {"letter", "char", "rand_1000_1", "rand_1000_2", "sim_1500_1", "sim_1500_2", "empty"};
     vector<string> hex;
     bool isDeterministic = true;
 
     cout << "\nHashing contents of the files for the first time... " << endl;
 
-    for (int i = 0; i < 7; ++i) {
-        string fileContents = readFileIntoStr("data/" + filenames[i] + ".txt");
+    for (auto &filename: filenames) {
+        string fileContents = readFileIntoStr("data/" + filename + ".txt");
         string hashValue = hash(fileContents);
         hex.push_back(hashValue);
         cout << "File hashing: " << hashValue << "; length: " << hashValue.size() * 4 << " bit" << endl;
@@ -116,7 +116,7 @@ void collisionTest() {
 }
 
 template<class HashFunc>
-void avalancheEffectTest(double blockSize) {
+void avalancheEffectTest(int wordSize) {
     HashFunc object;
 
     if (!std::filesystem::exists("data/sim_comb.txt"))
@@ -127,7 +127,6 @@ void avalancheEffectTest(double blockSize) {
 
     double hexMaxDiff = 0, hexMinDiff = 100.0, bitMaxDiff = 0, bitMinDiff = 100.0;
     double hexAvgDiff = 0, bitAvgDiff = 0, diffHex, diffBit;
-    double wordSize = object("word").size();
 
     for (int j = 0; j < 100000; ++j) {
         int diff_hex = 0, diff_bit = 0;
@@ -146,8 +145,8 @@ void avalancheEffectTest(double blockSize) {
             diff_bit += 8 - (str1Byte ^ str2Byte).count();
         }
 
-        diffHex = (diff_hex / wordSize) * 100;
-        diffBit = (diff_bit / blockSize) * 100;
+        diffHex = (diff_hex / (double) wordSize) * 100;
+        diffBit = (diff_bit / 512.0) * 100;
 
 
         hexAvgDiff += diffHex;
@@ -181,17 +180,16 @@ void avalancheEffectComparison() {
     SHA256 sha256;
     MD5 md5;
     SHA1 sha1;
-    CRC32 crc32;
     Keccak keccak;
 
     cout << "HASH: " << endl;
-    avalancheEffectTest<Hash>(512);
+    avalancheEffectTest<Hash>(64);
     cout << "SHA256: " << endl;
-    avalancheEffectTest<SHA256>(512);
+    avalancheEffectTest<SHA256>(64);
     cout << "MD5: " << endl;
-    avalancheEffectTest<MD5>(512);
+    avalancheEffectTest<MD5>(32);
     cout << "SHA1: " << endl;
-    avalancheEffectTest<SHA1>(512);
+    avalancheEffectTest<SHA1>(40);
     cout << "KECCAK: " << endl;
-    avalancheEffectTest<Keccak>(512);
+    avalancheEffectTest<Keccak>(64);
 }

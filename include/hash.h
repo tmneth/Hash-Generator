@@ -30,6 +30,8 @@ public:
 
     std::string getHashVal(const std::string &input);
 
+    std::string operator()(const std::string &text);
+
     ~Hash() = default;
 
 };
