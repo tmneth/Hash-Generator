@@ -1,15 +1,15 @@
 #include "../include/hash.h"
 
 /**
- * Initialize 8 8-bit semi-random keys
+ * Initialize 8 8-bit semi-random keys.
  */
 void Hash::initKeys() {
 
-    for (int i = 0; i < 80; ++i) {
+    for (int i = 0; i < 8; ++i) {
         std::bitset<8> b(std::rand());
         m_keys[i] = b.to_ulong();
     }
-    
+
 }
 
 /**
