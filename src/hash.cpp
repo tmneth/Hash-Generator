@@ -3,11 +3,11 @@
 /**
  * Initialize 8 8-bit semi-random keys.
  */
-void Hash::initKeys() {
+void MYSHA::initKeys() {
 
-    for (int i = 0; i < 8; ++i) {
+    for (uint32_t &key: m_keys) {
         std::bitset<8> b(std::rand());
-        m_keys[i] = b.to_ulong();
+        key = b.to_ulong();
     }
 
 }
@@ -15,15 +15,13 @@ void Hash::initKeys() {
 /**
  * Convert an input string to a vector consisting of one 8 bit value per ASCII character.
  */
-std::vector<uint8_t> Hash::strToAscii(const std::string &input) {
+std::vector<uint8_t> MYSHA::strToAscii(const std::string &input) {
 
     std::vector<uint8_t> bytes;
 
-    for (char c: input) {
-
+    for (const char &c: input) {
         std::bitset<8> b(c);
         bytes.push_back(b.to_ulong());
-
     }
 
     return bytes;
@@ -33,7 +31,7 @@ std::vector<uint8_t> Hash::strToAscii(const std::string &input) {
 /**
  * Calculate & add the required padding to the message.
  */
-std::vector<uint8_t> Hash::padBin(std::vector<uint8_t> bytes) {
+std::vector<uint8_t> MYSHA::padBin(std::vector<uint8_t> bytes) {
 
     int k = 0;
     uint64_t l = bytes.size() * 8;
@@ -53,7 +51,7 @@ std::vector<uint8_t> Hash::padBin(std::vector<uint8_t> bytes) {
 /**
  * Reduce to 8 32-bit words & compute hash values.
  */
-void Hash::computeHash(const std::string &input, std::vector<uint8_t> bytes) {
+void MYSHA::computeHash(const std::string &input, std::vector<uint8_t> bytes) {
 
     std::vector<std::uint32_t> words(16, 0);
 
@@ -87,7 +85,7 @@ void Hash::computeHash(const std::string &input, std::vector<uint8_t> bytes) {
 /**
  * Convert generated hash values to a hexadecimal string.
  */
-std::string Hash::hashToHex() {
+std::string MYSHA::hashToHex() {
 
     std::stringstream stream;
     for (std::uint32_t i: m_hashVal)
@@ -100,7 +98,7 @@ std::string Hash::hashToHex() {
 /**
  * Calculate and return final hash value.
  */
-std::string Hash::getHashVal(const std::string &input) {
+std::string MYSHA::getHashVal(const std::string &input) {
 
     std::srand(input.size());
     initKeys();
@@ -117,6 +115,6 @@ std::string Hash::getHashVal(const std::string &input) {
 /**
  * Overload parens to return hash value.
  */
-std::string Hash::operator()(const std::string &input) {
+std::string MYSHA::operator()(const std::string &input) {
     return getHashVal(input);
 }

@@ -6,7 +6,7 @@
 #include <string>
 #include <iomanip>
 
-class Hash {
+class MYSHA {
 
 private:
 
@@ -26,12 +26,12 @@ private:
 
 public:
 
-    Hash() = default;
+    MYSHA() = default;
 
     std::string getHashVal(const std::string &input);
 
     std::string operator()(const std::string &text);
 
-    ~Hash() = default;
+    ~MYSHA() = default;
 
 };

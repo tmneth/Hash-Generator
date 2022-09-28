@@ -8,7 +8,7 @@
 
 std::string readFileIntoStr(const std::string &path);
 
-void validateInput(int &user_input, int min_value, int max_value);
+void validateInput(int &userInput, int minValue, int maxValue);
 
 std::string randomString(std::size_t length);
 

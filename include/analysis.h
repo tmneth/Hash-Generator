@@ -21,8 +21,10 @@ using std::vector;
 
 void specificationTest();
 
-void efficiencyTest();
+void hashTimeTest();
 
 void collisionTest();
 
-void avalancheEffectComparison();
+void similarityTestComp();
+
+void hashTimeComp();
