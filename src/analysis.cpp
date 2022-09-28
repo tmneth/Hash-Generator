@@ -16,88 +16,56 @@ public:
 };
 
 void specificationTest() {
-    Hash hash{};
+    MYSHA mysha;
     string filenames[7] = {"letter", "char", "rand_1000_1", "rand_1000_2", "sim_1500_1", "sim_1500_2", "empty"};
     vector<string> hex;
     bool isDeterministic = true;
 
-    cout << "\nHashing contents of the files for the first time... " << endl;
-
     for (auto &filename: filenames) {
         string fileContents = readFileIntoStr("data/" + filename + ".txt");
-        string hashValue = hash(fileContents);
-        hex.push_back(hashValue);
-        cout << "File hashing: " << hashValue << "; length: " << hashValue.size() * 4 << " bit" << endl;
+        string hashValue1 = mysha(fileContents);
+        string hashValue2 = mysha(fileContents);
+        isDeterministic = (hashValue1 == hashValue2) && isDeterministic;
+        cout << "File: " << filename + ".txt; " << "Word size: " << hashValue1.size() << endl;
+        cout << "Hash: " << hashValue1 << endl;
+        cout << endl;
     }
 
-    cout << "\nHashing contents of the files the for second time... " << endl;
-
-    for (int i = 0; i < 7; ++i) {
-        string fileContents = readFileIntoStr("data/" + filenames[i] + ".txt");
-        string hashValue = hash(fileContents);
-        isDeterministic = (hashValue == hex[i]) & isDeterministic;
-        cout << "File hashing: " << hashValue << "; length: " << hashValue.size() * 4 << " bit" << endl;
-    }
-
-    cout << "\nHashing algorithm is" << (isDeterministic ? " " : " not ") << "deterministic." << endl;
+    cout << "Hashing algorithm is" << (isDeterministic ? " " : " not ") << "deterministic." << endl;
 }
 
-struct HashFunc {
-    string name;
-    double hashingTime;
-};
-
-void efficiencyTest() {
-    Hash hash;
-    SHA256 sha256;
-    MD5 md5;
-    SHA1 sha1;
-    Keccak keccak;
+void hashTimeTest() {
+    MYSHA mysha;
 
     Timer clock;
 
     int rounds{100};
+    vector<double> duration(10, 0);
 
-    HashFunc func[5] = {{"hash"},
-                        {"sha256"},
-                        {"md5"},
-                        {"sha1"},
-                        {"keccak"}};
-
-    for (int i = 0; i < rounds; ++i) {
-
-        std::ifstream fin("data/konstitucija.txt");
+    for (int m = 0; m < rounds; ++m) {
         string line;
 
-        while (getline(fin, line)) {
+        for (int i = 0, j = 1; i < 10; ++i, j *= 2) {
 
-            clock.reset();
-            hash(line);
-            func[0].hashingTime += clock.elapsed();
+            std::ifstream fin("data/konstitucija.txt");
 
-            clock.reset();
-            sha256(line);
-            func[1].hashingTime += clock.elapsed();
-
-            clock.reset();
-            md5(line);
-            func[2].hashingTime += clock.elapsed();
-
-            clock.reset();
-            sha1(line);
-            func[3].hashingTime += clock.elapsed();
-
-            clock.reset();
-            keccak(line);
-            func[4].hashingTime += clock.elapsed();
+            for (int z = 0; z < j; z++) {
+                getline(fin, line);
+                clock.reset();
+                mysha(line);
+                duration[i] += clock.elapsed();
+            }
         }
+
     }
-    for (const HashFunc &h: func)
-        cout << h.name << " average hashing time: " << (h.hashingTime / rounds) << "ms." << endl;
+    for (int j = 1, i = 0; i < duration.size(); j *= 2, i++)
+        cout << "Average hashing time to hash: " << j << " lines: " << std::to_string((duration[i] / rounds)) << "s."
+             << endl;
+
 }
 
 void collisionTest() {
-    Hash hash;
+    MYSHA mysha;
 
     if (!std::filesystem::exists("data/rand_comb.txt"))
         genRandPairs();
@@ -108,15 +76,16 @@ void collisionTest() {
     int collisions = 0;
     for (int i = 0; i < 100000; ++i) {
         fin >> str1 >> str2;
-        if (hash(str1) == hash(str2)) collisions++;
+        if (mysha(str1) == mysha(str2)) collisions++;
     }
-    cout << (collisions ? "Collisions found: " + std::to_string(collisions) : "No collisions were found.") << endl;
 
     fin.close();
+
+    cout << (collisions ? "Collisions found: " + std::to_string(collisions) : "No collisions were found.") << endl;
 }
 
 template<class HashFunc>
-void avalancheEffectTest(int wordSize) {
+void similarityTest(int wordSize) {
     HashFunc object;
 
     if (!std::filesystem::exists("data/sim_comb.txt"))
@@ -173,23 +142,78 @@ void avalancheEffectTest(int wordSize) {
 
     cout << "Biggest difference (hex): " << std::setprecision(2) << hexMaxDiff << "%" << endl;
     cout << "Biggest difference (bit): " << std::setprecision(2) << bitMaxDiff << "%" << endl;
+
+    cout << endl;
 }
 
-void avalancheEffectComparison() {
-    Hash hash;
+void similarityTestComp() {
+    cout << "MYSHA: " << endl;
+    similarityTest<MYSHA>(64);
+    cout << "SHA256: " << endl;
+    similarityTest<SHA256>(64);
+    cout << "MD5: " << endl;
+    similarityTest<MD5>(32);
+    cout << "SHA1: " << endl;
+    similarityTest<SHA1>(40);
+    cout << "KECCAK: " << endl;
+    similarityTest<Keccak>(64);
+}
+
+
+struct HashFunc {
+    string name;
+    double hashingTime;
+};
+
+void hashTimeComp() {
+    MYSHA mysha;
     SHA256 sha256;
     MD5 md5;
     SHA1 sha1;
     Keccak keccak;
 
-    cout << "HASH: " << endl;
-    avalancheEffectTest<Hash>(64);
-    cout << "SHA256: " << endl;
-    avalancheEffectTest<SHA256>(64);
-    cout << "MD5: " << endl;
-    avalancheEffectTest<MD5>(32);
-    cout << "SHA1: " << endl;
-    avalancheEffectTest<SHA1>(40);
-    cout << "KECCAK: " << endl;
-    avalancheEffectTest<Keccak>(64);
+    Timer clock;
+
+    int rounds{100};
+
+    HashFunc func[5] = {{"MYSHA"},
+                        {"SHA256"},
+                        {"MD5"},
+                        {"SHA1"},
+                        {"KECCAK"}};
+
+    for (int i = 0; i < rounds; ++i) {
+
+        std::ifstream fin("data/konstitucija.txt");
+        string line;
+
+        while (getline(fin, line)) {
+
+            clock.reset();
+            mysha(line);
+            func[0].hashingTime += clock.elapsed();
+
+            clock.reset();
+            sha256(line);
+            func[1].hashingTime += clock.elapsed();
+
+            clock.reset();
+            md5(line);
+            func[2].hashingTime += clock.elapsed();
+
+            clock.reset();
+            sha1(line);
+            func[3].hashingTime += clock.elapsed();
+
+            clock.reset();
+            keccak(line);
+            func[4].hashingTime += clock.elapsed();
+        }
+
+        fin.close();
+
+    }
+
+    for (const HashFunc &h: func)
+        cout << h.name << " average hashing time: " << (h.hashingTime / rounds) << "s." << endl;
 }
