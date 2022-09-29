@@ -126,7 +126,7 @@ For i from w[4…8]:
 ``` 
 ```
 For i from w[0…4]:
-    h[i] += h[i] xor h[i+3] >> (input.size() % 2) 
+    h[i] += h[i+1] xor h[i+3] >> (input.size() % 2) 
 ```
 ```
 00111001110011111010101001000100
