@@ -5,33 +5,15 @@
  */
 void MYSHA::initKeys() {
 
-    for (uint32_t &key: m_keys) {
-        std::bitset<8> b(std::rand());
-        key = b.to_ulong();
-    }
+    for (uint8_t &key: m_keys)
+        key = std::rand();
 
 }
-
-/**
- * Convert an input string to a vector consisting of one 8 bit value per ASCII character.
- */
-std::vector<uint8_t> MYSHA::strToAscii(const std::string &input) {
-
-    std::vector<uint8_t> bytes;
-
-    for (const char &c: input) {
-        std::bitset<8> b(c);
-        bytes.push_back(b.to_ulong());
-    }
-
-    return bytes;
-}
-
 
 /**
  * Calculate & add the required padding to the message.
  */
-std::vector<uint8_t> MYSHA::padBin(std::vector<uint8_t> bytes) {
+std::vector<uint8_t> MYSHA::addPad(std::vector<uint8_t> bytes) {
 
     int k = 0;
     uint64_t l = bytes.size() * 8;
@@ -41,7 +23,7 @@ std::vector<uint8_t> MYSHA::padBin(std::vector<uint8_t> bytes) {
     for (int i = 0; i < k / 8; i++)
         bytes.push_back(0x80);
 
-    for (const uint8_t key: m_keys)
+    for (const uint8_t &key: m_keys)
         bytes.push_back(key);
 
     return bytes;
@@ -88,7 +70,7 @@ void MYSHA::computeHash(const std::string &input, std::vector<uint8_t> bytes) {
 std::string MYSHA::hashToHex() {
 
     std::stringstream stream;
-    for (std::uint32_t i: m_hashVal)
+    for (const std::uint32_t &i: m_hashVal)
         stream << std::hex << std::setw(8) << std::setfill('0') << i;
 
     return stream.str();
@@ -103,9 +85,9 @@ std::string MYSHA::getHashVal(const std::string &input) {
     std::srand(input.size());
     initKeys();
 
-    std::vector<uint8_t> bytes;
-    bytes = strToAscii(input);
-    bytes = padBin(bytes);
+    std::vector<uint8_t> bytes(input.begin(), input.end());
+
+    bytes = addPad(bytes);
     computeHash(input, bytes);
 
     return hashToHex();
@@ -116,5 +98,7 @@ std::string MYSHA::getHashVal(const std::string &input) {
  * Overload parens to return hash value.
  */
 std::string MYSHA::operator()(const std::string &input) {
+
     return getHashVal(input);
+
 }

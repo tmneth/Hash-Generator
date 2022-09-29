@@ -12,13 +12,11 @@ private:
 
     std::uint32_t m_hashVal[8];
 
-    std::uint32_t m_keys[8];
+    std::uint8_t m_keys[8];
 
     void initKeys();
 
-    std::vector<uint8_t> strToAscii(const std::string &input);
-
-    std::vector<uint8_t> padBin(std::vector<uint8_t> bytes);
+    std::vector<uint8_t> addPad(std::vector<uint8_t> bytes);
 
     void computeHash(const std::string &input, std::vector<uint8_t> bytes);
 
@@ -31,7 +29,5 @@ public:
     std::string getHashVal(const std::string &input);
 
     std::string operator()(const std::string &text);
-
-    ~MYSHA() = default;
 
 };
