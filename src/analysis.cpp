@@ -91,7 +91,7 @@ void collisionTest() {
 }
 
 template<class HashFunc>
-void similarityTest(int wordSize) {
+void similarityTest() {
     HashFunc func;
 
 
@@ -101,8 +101,10 @@ void similarityTest(int wordSize) {
     double hexMaxDiff = 0, hexMinDiff = 100.0, bitMaxDiff = 0, bitMinDiff = 100.0;
     double hexAvgDiff = 0, bitAvgDiff = 0, diffHex, diffBit;
 
+    double wordSize = func("test").size();
+
     for (int j = 0; j < 100000; ++j) {
-        int diff_hex = 0, diff_bit = 0;
+        int diffHexCount = 0, diffBitCount = 0;
         fin >> str1 >> str2;
 
         str1 = func(str1);
@@ -110,28 +112,24 @@ void similarityTest(int wordSize) {
 
         for (int i = 0; i < wordSize; i++) {
 
-            if (str1[i] != str2[i]) diff_hex++;
+            if (str1[i] != str2[i]) diffHexCount++;
 
             std::bitset<8> str1Byte(str1[i]);
             std::bitset<8> str2Byte(str2[i]);
 
-            diff_bit += 8 - (str1Byte ^ str2Byte).count();
+            diffBitCount += 8 - (str1Byte ^ str2Byte).count();
         }
-
-        diffHex = (diff_hex / (double) wordSize) * 100;
-        diffBit = (diff_bit / 512.0) * 100;
-
+        diffHex = (diffHexCount / wordSize) * 100;
+        diffBit = (diffBitCount / (wordSize * 8)) * 100;
 
         hexAvgDiff += diffHex;
         bitAvgDiff += diffBit;
-
 
         hexMaxDiff = std::max(hexMaxDiff, diffHex);
         bitMaxDiff = std::max(bitMaxDiff, diffBit);
 
         hexMinDiff = std::min(hexMinDiff, diffHex);
         bitMinDiff = std::min(bitMinDiff, diffBit);
-
     }
 
     fin.close();
@@ -155,15 +153,15 @@ void similarityTestComp() {
         genSimPairs();
 
     cout << "MYSHA: " << endl;
-    similarityTest<MYSHA>(64);
+    similarityTest<MYSHA>();
     cout << "SHA256: " << endl;
-    similarityTest<SHA256>(64);
+    similarityTest<SHA256>();
     cout << "MD5: " << endl;
-    similarityTest<MD5>(32);
+    similarityTest<MD5>();
     cout << "SHA1: " << endl;
-    similarityTest<SHA1>(40);
+    similarityTest<SHA1>();
     cout << "KECCAK: " << endl;
-    similarityTest<Keccak>(64);
+    similarityTest<Keccak>();
 }
 
 

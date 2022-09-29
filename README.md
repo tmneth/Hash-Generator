@@ -117,7 +117,7 @@ No collisions were found.
 
 Overall, MYSHA performance results are nearly identical to those of SHA256.
 
-However, MYSHA beats all the function by the average and biggest bitwise difference of 67.57% and 77.34% respectively.
+However, MYSHA beats all the function by the average bitwise difference of 67.57%.
 
 MYSHA:
 
@@ -145,22 +145,22 @@ MD5:
 
 ```
 Avg difference (hex): 93.73%
-Avg difference (bit): 33.49%
+Avg difference (bit): 66.99%
 Min difference (hex): 68.75%
-Min difference (bit): 27.15%
+Min difference (bit): 54.30%
 Max difference (hex): 100.00%
-Max difference (bit): 40.23%
+Max difference (bit): 80.47%
 ```
 
 SHA1:
 
 ```
 Avg difference (hex): 93.75%
-Avg difference (bit): 41.87%
+Avg difference (bit): 66.99%
 Min difference (hex): 70.00%
-Min difference (bit): 34.96%
+Min difference (bit): 55.94%
 Max difference (hex): 100.00%
-Max difference (bit): 49.22%
+Max difference (bit): 78.75%
 ```
 
 KECCAK:
