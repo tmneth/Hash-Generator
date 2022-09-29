@@ -26,16 +26,19 @@ void specificationTest() {
         string hashValue1 = mysha(fileContents);
         string hashValue2 = mysha(fileContents);
         isDeterministic = (hashValue1 == hashValue2) && isDeterministic;
-        cout << "File: " << filename + ".txt; " << "Word size: " << hashValue1.size() << endl;
-        cout << "Hash: " << hashValue1 << endl;
+        cout << "Hashing twice file: " << filename + ".txt; " << "Word size: " << hashValue1.size() << endl;
+        cout << "Hash (1): " << hashValue1 << endl;
+        cout << "Hash (2): " << hashValue2 << endl;
+        cout << "Hashes are: " << (isDeterministic ? "identical" : "different") << endl;
         cout << endl;
     }
 
-    cout << "Hashing algorithm is" << (isDeterministic ? " " : " not ") << "deterministic." << endl;
+    cout << "Conclusion: hashing algorithm is" << (isDeterministic ? " " : " not ") << "deterministic." << endl;
 }
 
+//template<class HashFunc>
 void hashTimeTest() {
-    MYSHA mysha;
+    MYSHA func;
 
     Timer clock;
 
@@ -52,9 +55,12 @@ void hashTimeTest() {
             for (int z = 0; z < j; z++) {
                 getline(fin, line);
                 clock.reset();
-                mysha(line);
+                func(line);
                 duration[i] += clock.elapsed();
             }
+
+            fin.close();
+
         }
 
     }
@@ -86,7 +92,7 @@ void collisionTest() {
 
 template<class HashFunc>
 void similarityTest(int wordSize) {
-    HashFunc object;
+    HashFunc func;
 
     if (!std::filesystem::exists("data/sim_comb.txt"))
         genSimPairs();
@@ -101,8 +107,8 @@ void similarityTest(int wordSize) {
         int diff_hex = 0, diff_bit = 0;
         fin >> str1 >> str2;
 
-        str1 = object(str1);
-        str2 = object(str2);
+        str1 = func(str1);
+        str2 = func(str2);
 
         for (int i = 0; i < wordSize; i++) {
 
@@ -134,14 +140,14 @@ void similarityTest(int wordSize) {
 
     cout << std::fixed;
 
-    cout << "Average difference (hex): " << std::setprecision(2) << hexAvgDiff / 100000 << "%" << endl;
-    cout << "Average difference (bit): " << std::setprecision(2) << bitAvgDiff / 100000 << "%" << endl;
+    cout << "Avg difference (hex): " << std::setprecision(2) << hexAvgDiff / 100000 << "%" << endl;
+    cout << "Avg difference (bit): " << std::setprecision(2) << bitAvgDiff / 100000 << "%" << endl;
 
-    cout << "Smallest difference (hex): " << std::setprecision(2) << hexMinDiff << "%" << endl;
-    cout << "Smallest difference (bit): " << std::setprecision(2) << bitMinDiff << "%" << endl;
+    cout << "Min difference (hex): " << std::setprecision(2) << hexMinDiff << "%" << endl;
+    cout << "Min difference (bit): " << std::setprecision(2) << bitMinDiff << "%" << endl;
 
-    cout << "Biggest difference (hex): " << std::setprecision(2) << hexMaxDiff << "%" << endl;
-    cout << "Biggest difference (bit): " << std::setprecision(2) << bitMaxDiff << "%" << endl;
+    cout << "Max difference (hex): " << std::setprecision(2) << hexMaxDiff << "%" << endl;
+    cout << "Max difference (bit): " << std::setprecision(2) << bitMaxDiff << "%" << endl;
 
     cout << endl;
 }

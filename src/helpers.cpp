@@ -39,8 +39,8 @@ void genRandPairs() {
     std::cout << "Generating text file..." << std::endl;
 
     std::string buffer;
-
     int length[4] = {10, 100, 500, 1000};
+
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 25000 / 2; j++)
             buffer.append(randomString(length[i]) + " " + randomString(length[i]) + "\n");
