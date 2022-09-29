@@ -101,13 +101,15 @@ average time was calculated).
 
 Time complexity of the hash function is O(n).
 
-| Lines | 1          | 2          | 4          | 8          | 16         | 32         | 64          | 128        | 256         | 512       |
-|-------|------------|------------|------------|------------|------------|------------|-------------|------------|-------------|-----------|
-| Time  | 0.000003s. | 0.000006s. | 0.000011s. | 0.000023s. | 0.000046s. | 0.000092s. | 0.0000183s. | 0.000366s. | 0.0007730s. | 0.001455. |
+| Lines | 1          | 2          | 4          | 8          | 16         | 32         | 64          | 128        | 256         | 512        |
+|-------|------------|------------|------------|------------|------------|------------|-------------|------------|-------------|------------|
+| Time  | 0.000003s. | 0.000006s. | 0.000011s. | 0.000023s. | 0.000046s. | 0.000092s. | 0.0000183s. | 0.000366s. | 0.0007730s. | 0.001455s. |
+
+`-O3 optimization was used for this test`
 
 ### Part 3 - Collision Test
 
-For this test pairs of randomly generated lines were hashed and compared.
+For this test, pairs of randomly generated lines were hashed and compared.
 
 No collisions were found.
 
@@ -117,7 +119,8 @@ Overall, MYSHA performance results are nearly identical to those of SHA256.
 
 However, MYSHA beats all the function by the average and biggest bitwise difference of 67.57% and 77.34% respectively.
 
-MYSHA: 
+MYSHA:
+
 ```
 Avg difference (hex): 91.48%
 Avg difference (bit): 67.57%
@@ -126,7 +129,9 @@ Min difference (bit): 57.03%
 Max difference (hex): 100.00%
 Max difference (bit): 77.34%
 ```
+
 SHA256:
+
 ```
 Avg difference (hex): 93.74%
 Avg difference (bit): 66.99%
@@ -135,7 +140,9 @@ Min difference (bit): 57.23%
 Max difference (hex): 100.00%
 Max difference (bit): 76.37%
 ```
-MD5: 
+
+MD5:
+
 ```
 Avg difference (hex): 93.73%
 Avg difference (bit): 33.49%
@@ -144,7 +151,9 @@ Min difference (bit): 27.15%
 Max difference (hex): 100.00%
 Max difference (bit): 40.23%
 ```
+
 SHA1:
+
 ```
 Avg difference (hex): 93.75%
 Avg difference (bit): 41.87%
@@ -153,7 +162,9 @@ Min difference (bit): 34.96%
 Max difference (hex): 100.00%
 Max difference (bit): 49.22%
 ```
+
 KECCAK:
+
 ```
 Avg difference (hex): 93.74%
 Avg difference (bit): 66.99%
@@ -166,7 +177,7 @@ Max difference (bit): 76.17%
 ### Part 5 - Comparison With Other Functions
 
 For this test, functions had to hash every single line of konstitucija.txt. (100 hashing rounds were performed & the
-average time was calculated). -O3 optimization was used for this test.
+average time was calculated).
 
 Compared to existing hash functions, MYSHA was the slowest.
 
@@ -177,3 +188,5 @@ MD5 average hashing time: 0.00114694s.
 SHA1 average hashing time: 0.00141966s.
 KECCAK average hashing time: 0.00158276s.
 ```
+
+`-O3 optimization was used for this test`

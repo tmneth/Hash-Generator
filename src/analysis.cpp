@@ -94,8 +94,6 @@ template<class HashFunc>
 void similarityTest(int wordSize) {
     HashFunc func;
 
-    if (!std::filesystem::exists("data/sim_comb.txt"))
-        genSimPairs();
 
     std::ifstream fin("data/sim_comb.txt");
     string line, str1, str2;
@@ -153,6 +151,9 @@ void similarityTest(int wordSize) {
 }
 
 void similarityTestComp() {
+    if (!std::filesystem::exists("data/sim_comb.txt"))
+        genSimPairs();
+
     cout << "MYSHA: " << endl;
     similarityTest<MYSHA>(64);
     cout << "SHA256: " << endl;

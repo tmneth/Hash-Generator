@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
     switch (userChoice) {
         case 1:
-            cout << "Enter a string: \n";
+            cout << "Enter a string: ";
             cin.ignore(1000, '\n');
             getline(cin, inputStr);
             cout << mysha(inputStr) << endl;
