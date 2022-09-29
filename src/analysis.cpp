@@ -117,7 +117,8 @@ void similarityTest() {
             std::bitset<8> str1Byte(str1[i]);
             std::bitset<8> str2Byte(str2[i]);
 
-            diffBitCount += 8 - (str1Byte ^ str2Byte).count();
+            diffBitCount += (str1Byte ^ str2Byte).count();
+
         }
         diffHex = (diffHexCount / wordSize) * 100;
         diffBit = (diffBitCount / (wordSize * 8)) * 100;
