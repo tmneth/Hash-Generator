@@ -3,8 +3,6 @@ project(hash_generator)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_compile_options(-O3)
-
 include_directories(include)
 include_directories(lib)
 
