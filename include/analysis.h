@@ -19,12 +19,4 @@ using std::endl;
 using std::string;
 using std::vector;
 
-void specificationTest();
-
-void hashTimeTest();
-
-void collisionTest();
-
-void similarityTestComp();
-
-void hashTimeComp();
+void loadTests();

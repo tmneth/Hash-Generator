@@ -71,3 +71,18 @@ void genSimPairs() {
     fout << buffer.data();
     fout.close();
 }
+
+void genRandStr() {
+    std::cout << "Generating text file..." << std::endl;
+
+    std::string buffer;
+
+    for (int j = 0; j < 25000; j++) {
+        std::string curStr = randomString(10);
+        buffer.append(curStr + "\n");
+    }
+
+    std::ofstream fout("data/rand_str.txt");
+    fout << buffer.data();
+    fout.close();
+}

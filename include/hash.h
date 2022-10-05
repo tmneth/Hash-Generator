@@ -14,6 +14,8 @@ private:
 
     std::uint8_t m_keys[8];
 
+    std::string m_salt{};
+
     void initKeys();
 
     std::vector<uint8_t> addPad(std::vector<uint8_t> bytes);
@@ -26,7 +28,9 @@ public:
 
     MYSHA() = default;
 
-    std::string getHashVal(const std::string &input);
+    void setSalt(const std::string &salt);
+
+    std::string getHashVal(std::string input);
 
     std::string operator()(const std::string &text);
 

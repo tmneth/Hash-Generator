@@ -25,6 +25,7 @@ void specificationTest() {
         string fileContents = readFileIntoStr("data/" + filename + ".txt");
         string hashValue1 = mysha(fileContents);
         string hashValue2 = mysha(fileContents);
+
         isDeterministic = (hashValue1 == hashValue2) && isDeterministic;
         cout << "Hashing twice file: " << filename + ".txt; " << "Word size: " << hashValue1.size() << endl;
         cout << "Hash (1): " << hashValue1 << endl;
@@ -36,9 +37,9 @@ void specificationTest() {
     cout << "Conclusion: hashing algorithm is" << (isDeterministic ? " " : " not ") << "deterministic." << endl;
 }
 
-//template<class HashFunc>
+template<class HashFunc>
 void hashTimeTest() {
-    MYSHA func;
+    HashFunc func;
 
     Timer clock;
 
@@ -67,7 +68,6 @@ void hashTimeTest() {
     for (int j = 1, i = 0; i < duration.size(); j *= 2, i++)
         cout << "Average hashing time to hash: " << j << " lines: " << std::to_string((duration[i] / rounds)) << "s."
              << endl;
-
 }
 
 void collisionTest() {
@@ -137,14 +137,14 @@ void similarityTest() {
 
     cout << std::fixed;
 
-    cout << "Avg difference (hex): " << std::setprecision(2) << hexAvgDiff / 100000 << "%" << endl;
-    cout << "Avg difference (bit): " << std::setprecision(2) << bitAvgDiff / 100000 << "%" << endl;
+    cout << "Avg difference (hex): " << std::setprecision(4) << hexAvgDiff / 100000 << "%" << endl;
+    cout << "Avg difference (bit): " << std::setprecision(4) << bitAvgDiff / 100000 << "%" << endl;
 
-    cout << "Min difference (hex): " << std::setprecision(2) << hexMinDiff << "%" << endl;
-    cout << "Min difference (bit): " << std::setprecision(2) << bitMinDiff << "%" << endl;
+    cout << "Min difference (hex): " << std::setprecision(4) << hexMinDiff << "%" << endl;
+    cout << "Min difference (bit): " << std::setprecision(4) << bitMinDiff << "%" << endl;
 
-    cout << "Max difference (hex): " << std::setprecision(2) << hexMaxDiff << "%" << endl;
-    cout << "Max difference (bit): " << std::setprecision(2) << bitMaxDiff << "%" << endl;
+    cout << "Max difference (hex): " << std::setprecision(4) << hexMaxDiff << "%" << endl;
+    cout << "Max difference (bit): " << std::setprecision(4) << bitMaxDiff << "%" << endl;
 
     cout << endl;
 }
@@ -165,61 +165,76 @@ void similarityTestComp() {
     similarityTest<Keccak>();
 }
 
-
-struct HashFunc {
-    string name;
-    double hashingTime;
-};
-
-void hashTimeComp() {
+void saltTest() {
     MYSHA mysha;
-    SHA256 sha256;
-    MD5 md5;
-    SHA1 sha1;
-    Keccak keccak;
+    string filenames[7] = {"letter", "char", "rand_1000_1", "rand_1000_2", "sim_1500_1", "sim_1500_2", "empty"};
+    vector<string> hex;
+    bool isDeterministic = true;
 
-    Timer clock;
+    for (auto &filename: filenames) {
+        string fileContents = readFileIntoStr("data/" + filename + ".txt");
 
-    int rounds{100};
+        string hashValue1 = mysha(fileContents);
+        mysha.setSalt(randomString(10));
+        string hashValue2 = mysha(fileContents);
 
-    HashFunc func[5] = {{"MYSHA"},
-                        {"SHA256"},
-                        {"MD5"},
-                        {"SHA1"},
-                        {"KECCAK"}};
-
-    for (int i = 0; i < rounds; ++i) {
-
-        std::ifstream fin("data/konstitucija.txt");
-        string line;
-
-        while (getline(fin, line)) {
-
-            clock.reset();
-            mysha(line);
-            func[0].hashingTime += clock.elapsed();
-
-            clock.reset();
-            sha256(line);
-            func[1].hashingTime += clock.elapsed();
-
-            clock.reset();
-            md5(line);
-            func[2].hashingTime += clock.elapsed();
-
-            clock.reset();
-            sha1(line);
-            func[3].hashingTime += clock.elapsed();
-
-            clock.reset();
-            keccak(line);
-            func[4].hashingTime += clock.elapsed();
-        }
-
-        fin.close();
-
+        cout << "Hashing twice file: " << filename + ".txt; " << "Word size: " << hashValue1.size() << endl;
+        cout << "Hash (original): " << hashValue1 << endl;
+        cout << "Hash (salted): " << hashValue2 << endl;
+        cout << endl;
     }
 
-    for (const HashFunc &h: func)
-        cout << h.name << " average hashing time: " << (h.hashingTime / rounds) << "s." << endl;
+}
+
+
+void hashTimeComp() {
+    cout << "MYSHA: " << endl;
+    hashTimeTest<MYSHA>();
+    cout << "SHA256: " << endl;
+    hashTimeTest<SHA256>();
+    cout << "MD5: " << endl;
+    hashTimeTest<MD5>();
+    cout << "SHA1: " << endl;
+    hashTimeTest<SHA1>();
+    cout << "KECCAK: " << endl;
+    hashTimeTest<Keccak>();
+}
+
+void loadTests() {
+    int userChoice;
+    string inputStr, filename, fileContents;
+
+    cout << "Choose a test:\n"
+         << "1. I/O test\n"
+         << "2. Time complexity test\n"
+         << "3. Collision  resistance test\n"
+         << "4. Avalanche effect test\n"
+         << "5. Comparison with sha256, md5, sha1, keccak\n"
+         << "6. Salt test\n";
+
+    cout << string(50, '-') << endl;
+    cout << "Your choice: ";
+    cin >> userChoice;
+    validateInput(userChoice, 1, 6);
+
+    switch (userChoice) {
+        case 1:
+            specificationTest();
+            break;
+        case 2:
+            hashTimeTest<MYSHA>();
+            break;
+        case 3:
+            collisionTest();
+            break;
+        case 4:
+            similarityTestComp();
+            break;
+        case 5:
+            hashTimeComp();
+            break;
+        case 6:
+            saltTest();
+            break;
+    }
 }

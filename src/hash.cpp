@@ -1,6 +1,15 @@
 #include "../include/hash.h"
 
 /**
+ * Add salt.
+ */
+void MYSHA::setSalt(const std::string &salt) {
+
+    m_salt = salt;
+
+}
+
+/**
  * Initialize 8 8-bit semi-random keys.
  */
 void MYSHA::initKeys() {
@@ -43,8 +52,11 @@ void MYSHA::computeHash(const std::string &input, std::vector<uint8_t> bytes) {
                     (uint32_t(bytes[j]) << 24) | (uint32_t(bytes[j + 1]) << 16) |
                     (uint32_t(bytes[j + 2]) << 8) |
                     uint32_t(bytes[j + 3]);
+
             words[z] ^= ui32;
+
         }
+
 
     bytes.clear();
 
@@ -80,7 +92,12 @@ std::string MYSHA::hashToHex() {
 /**
  * Calculate and return final hash value.
  */
-std::string MYSHA::getHashVal(const std::string &input) {
+std::string MYSHA::getHashVal(std::string input) {
+
+    if (!m_salt.empty())
+        input += m_salt;
+
+    m_salt = "";
 
     std::srand(input.size());
     initKeys();
