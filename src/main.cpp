@@ -1,55 +1,49 @@
-#include "../include/main.h"
+#include <iostream>
+#include <string>
+#include "../include/hash.h"
+#include "../include/analysis.h"
+
+void showHelpMessage() {
+    std::cerr
+            << "Please use one of the following flags:\n"
+            << "-h, --help: Show this help message\n"
+            << "-f, --file: Hash a file\n"
+            << "-s, --string: Hash an input string\n"
+            << "-t, --tests: Perform tests\n"
+            << "--salt: Add salt to hash\n"
+            << std::endl;
+}
 
 int main(int argc, char *argv[]) {
 
     MYSHA mysha;
-    int userChoice;
-    string inputStr, filename, fileContents;
+    std::string fileContents;
 
-    cout << "You want to: " << endl;
-    cout << "1. Hash a string" << endl;
-    cout << "2. Hash a file" << endl;
-    cout << "3. I/O test" << endl;
-    cout << "4. Measure time complexity" << endl;
-    cout << "5. Test on collisions" << endl;
-    cout << "6. Test on Avalanche effect" << endl;
-    cout << "7. Compare hashing time to sha256, md5, sha1, keccak" << endl;
-
-    cout << string(50, '-') << endl;
-    cout << "Your choice: ";
-    cin >> userChoice;
-    validateInput(userChoice, 1, 7);
-
-    switch (userChoice) {
-        case 1:
-            cout << "Enter a string: ";
-            cin.ignore(1000, '\n');
-            getline(cin, inputStr);
-            cout << mysha(inputStr) << endl;
-            break;
-        case 2:
-            if (argc < 2) {
-                cerr << "No valid input file was found." << endl;
-            } else {
-                fileContents = readFileIntoStr(argv[1]);
-                cout << mysha(fileContents) << endl;
-            }
-            break;
-        case 3:
-            specificationTest();
-            break;
-        case 4:
-            hashTimeTest();
-            break;
-        case 5:
-            collisionTest();
-            break;
-        case 6:
-            similarityTestComp();
-            break;
-        case 7:
-            hashTimeComp();
-            break;
+    if (argc == 1) {
+        showHelpMessage();
+        return 1;
     }
+
+    for (int i = 0; i < argc; i++) {
+
+        std::string arg = argv[i];
+
+        if ((arg == "-h") || (arg == "--help") || argv[1][0] != '-') {
+            showHelpMessage();
+            return 1;
+        } else if ((arg == "-s") || (arg == "--string")) {
+            std::cout << mysha(argv[i + 1]) << std::endl;
+        } else if ((arg == "-f") || (arg == "--file")) {
+            fileContents = readFileIntoStr(argv[i + 1]);
+            std::cout << mysha(fileContents) << std::endl;
+        } else if ((arg == "-t") || (arg == "--tests")) {
+            loadTests();
+        } else if (arg == "--salt") {
+            mysha.setSalt(argv[i + 1]);
+        }
+
+    }
+
     return 0;
+
 }
